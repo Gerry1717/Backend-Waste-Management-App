@@ -10,7 +10,6 @@ const fs = require('fs')
 const path = require('path')
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
-const csrf = require('csurf')
 const cookieParser = require('cookie-parser')
 const cors = require('cors') // Add this line
 
@@ -35,8 +34,6 @@ app.use(
     }
   })
 )
-
-const csrfProtection = csrf({ cookie: true })
 
 const requireAuth = async (req, res, next) => {
   try {
