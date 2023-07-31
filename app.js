@@ -1,19 +1,19 @@
 require('dotenv').config()
 
-const express = require('express')
+const express = require('express') //
 const bodyParser = require('body-parser')
-const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
-const session = require('express-session')
-const http = require('http')
-const fs = require('fs')
-const path = require('path')
-const crypto = require('crypto')
-const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose') // db access driver for mongodb
+const bcrypt = require('bcrypt') // hashed passwords for storage
+const session = require('express-session') // login and auth sessions
+const http = require('http') // serving https server
+const fs = require('fs') // file access to local server
+const path = require('path') //
+const crypto = require('crypto') //
+const jwt = require('jsonwebtoken') //
 const cookieParser = require('cookie-parser')
-const cors = require('cors') // Add this line
-
-const sslCertsPath = path.join(__dirname, 'sslcerts')
+const cors = require('cors') // cross orgin access to resources recieved/sent by server
+const morgan = require('morgan')
+const winston = require('winston')
 
 const app = express()
 
@@ -311,11 +311,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' })
 })
 
-const httpsOptions = {
-  key: fs.readFileSync(path.join(sslCertsPath, 'server.key')),
-  cert: fs.readFileSync(path.join(sslCertsPath, 'server.crt'))
-}
-
-http.createServer(app).listen(8080, () => {
-  console.log('HTTP Server listening on port 8080')
+const port = process.env.PORT || 8080
+app.listen(port, () => {
+  winston.info(`HTTP Server listening on port ${port}`)
 })
