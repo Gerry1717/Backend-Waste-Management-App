@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const session = require('express-session')
-const https = require('https')
+const http = require('http')
 const fs = require('fs')
 const path = require('path')
 const crypto = require('crypto')
@@ -83,6 +83,8 @@ const Product = mongoose.model('Product', productSchema)
 
 app.post('/api/register', async (req, res) => {
   const { name, username, password } = req.body
+
+  if (name === undefined || username === undefined || password === undefined) return res.status(400).json({ error: 'Incomplete Data Entry' })
 
   const existingUser = await User.findOne({ username })
   if (existingUser) {
@@ -314,6 +316,6 @@ const httpsOptions = {
   cert: fs.readFileSync(path.join(sslCertsPath, 'server.crt'))
 }
 
-https.createServer(httpsOptions, app).listen(443, () => {
-  console.log('Server listening on port 443')
+http.createServer(app).listen(8080, () => {
+  console.log('HTTP Server listening on port 8080')
 })
