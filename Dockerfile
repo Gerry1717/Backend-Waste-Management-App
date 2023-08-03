@@ -1,18 +1,24 @@
-# Use a Node.js base image
-FROM node:14
+# Use a base image that includes both Node.js and Python
+FROM nikolaik/python-nodejs:python3.8-nodejs16
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the application files to the container
-COPY package.json package-lock.json ./
-COPY . .
+# Install Python dependencies
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
 # Install the application dependencies
-RUN npm install
+RUN npm ci
+
+# Copy the rest of your application code to the container (exclude node_modules)
+COPY . .
 
 # Expose the desired port
-EXPOSE 443
+EXPOSE 8080
 
 # Start the application
-CMD ["npm", "start"]
+CMD ["node", "app.js"]
