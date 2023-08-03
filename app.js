@@ -96,7 +96,6 @@ const userSchema = new Schema({
   username: { type: String, require: true },
   password: { type: String, require: true },
   isVerified: { type: Boolean, default: false },
-  latestVerificationCode: { type: String },
   tokenVersion: { type: Number, default: 0 }
 })
 
@@ -109,7 +108,8 @@ const productSchema = new Schema({
 const FridgeSchema = new Schema({
   item: { type: String, require: true },
   owner: { type: String, require: true },
-  expiry: { type: Date, require: true }
+  expiry: { type: Date, require: true },
+  dateAdded: { type: Date, require: true }
 
 })
 
@@ -117,7 +117,7 @@ const UserVerificationCodeSchema = new Schema({
 
   owner: { type: String, require: true },
   code: { type: String, require: true },
-  dateCreated: { type: String, require: true },
+  dateCreated: { type: Date, default: Date.now },
   expiry: { type: String, require: true }
 
 })
@@ -246,6 +246,7 @@ app.post('/api/login', async (req, res) => {
   }
 
   const token = jwt.sign({ username, tokenVersion: user.tokenVersion }, sessionSecret, { expiresIn: '1h' })
+
   res.json({ message: 'Login successful', token, user: user.name, username })
 })
 
@@ -322,6 +323,31 @@ app.get('/api/user-fridge-items', requireAuth, async (req, res) => {
     res.json(fridges)
   } catch (err) {
     res.status(500).json({ error: err })
+  }
+})
+
+// Create a new fridge item
+app.post('/api/user-add-fridge-item', requireAuth, async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1]
+    const { username } = jwt.verify(token, sessionSecret)
+    const { item, expiry } = req.body
+
+    let expiryDate = expiry
+    if (!expiryDate) {
+      expiryDate = new Date('2000-01-01T00:00:01')
+    }
+    const newFridgeItem = new Fridge({
+      item,
+      owner: username,
+      expiry: expiryDate
+    })
+
+    const savedFridgeItem = await newFridgeItem.save()
+
+    res.status(201).json({ message: 'Fridge item added successfully', data: savedFridgeItem })
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error', message: error.message })
   }
 })
 
@@ -434,7 +460,6 @@ app.post('/api/logout', requireAuth, async (req, res) => {
   const { username } = jwt.verify(token, sessionSecret)
 
   await User.updateOne({ username }, { $inc: { tokenVersion: 1 } })
-
   req.session.destroy(err => {
     if (err) {
       return res.status(500).json({ error: 'Could not log out, please try again' })
@@ -446,7 +471,8 @@ app.post('/api/logout', requireAuth, async (req, res) => {
 })
 
 app.post('/api/delete-user', requireAuth, async (req, res) => {
-  const username = req.body.username
+  const token = req.headers.authorization.split(' ')[1]
+  const { username } = jwt.verify(token, sessionSecret)
 
   // Validate the request body
   if (!username) {
