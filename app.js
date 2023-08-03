@@ -262,7 +262,7 @@ app.get('/api/user-details', requireAuth, async (req, res) => {
     }
 
     // Return the user's name and username
-    res.json({ name: user.name, username: user.username })
+    res.json({ name: user.name, username: user.username, isVerified: user.isVerified })
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Internal server error' })
