@@ -1,7 +1,7 @@
 # WasteManagementMobileApp/BackEnd
 #### Node.js backend Server with MongoDB storage intergrated with a mongoose driver  
 #### Express session for user login and auth
-#### Java Web Token (Stateless - Expiry 1hr)
+#### Java Web Token ( Expiry 1hr)
 
 # Testing the APIs
 With Curl on windows cmd: 
