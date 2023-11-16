@@ -37,8 +37,8 @@ def send_verification_code(api_key, sender_id, recipient_number):
         return "Error sending verification code: {}".format(e), None
 
 # Replace this with your actual API credentials and sender ID
-API_KEY = "62c2c5367831d67dc6dde50bc5473fa4-b73c7989-00d4-405e-a4e9-903ac1031d55"
-SENDER_ID = "447307810002"
+API_KEY = "<YOUR INFOBIP KEY from API>"
+SENDER_ID = "<YOUR INFO BIP LONGNUMBER (SMS NUMBER)>"
 
 # Check if the recipient number is provided as a command-line argument
 if len(sys.argv) < 2:
